@@ -30,7 +30,8 @@ export default {
 body {
     color: #333;
     -webkit-text-size-adjust: none;
-    background-color: #f7f7f7;;
+    background-color: #f7f7f7;
+    -webkit-font-smoothing: antialiased;
 }
 
 img,fieldset {

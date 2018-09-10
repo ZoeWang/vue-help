@@ -64,6 +64,7 @@
 	.help-details {
 		min-width: 320px;
 		padding: 36/2px 38/2px;
+		margin-top: 60px;
 	}
 
 	.title {

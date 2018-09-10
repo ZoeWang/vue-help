@@ -1,32 +1,33 @@
 <template>
 	<div class="sidebar">
-		
-		<!-- m端 -->
-		<h1 class="logo">
-			<img src="../../assets/logo-white.png" alt="师训宝">
-		</h1>
-		
+		<nav class="nav">
+			<!-- m端 -->
+			<h1 class="logo">
+				<img src="../../assets/logo-white.png" alt="师训宝">
+			</h1>
+			
 
-		<ul class="menu">
-			<li v-for="item in items">
-				<h2 class="clearfix" @click="showToggle(item)">{{item.name}}  <i :class="[item.isSubShow ? 'icon-greyline-up' : 'icon-greyline-down']"></i></h2>
-				<ul class="sub-menu" v-show="item.isSubShow">
-					<li class="" v-for="subItem in item.subItems">
-						<router-link to="">{{subItem.name}}</router-link>
-					</li>
-				</ul>
-			</li>
-			<!-- <li>
-				<h2 class="clearfix">玩转班级  <i class="icon-greyline-down"></i></h2>
-				<ul class="sub-menu">
-					<li>通化市兴化教育中心第一小学教研活动拉开序幕？</li>
-					<li>怎样使用文档微课？</li>
-					<li>怎样使用提问？</li>
-					<li>怎样使用拍照上墙？</li>
-					<li>怎样使用签到 ？</li>
-				</ul>
-			</li> -->
-		</ul>
+			<ul class="menu">
+				<li v-for="item in items">
+					<h2 class="clearfix" @click="showToggle(item)">{{item.name}}  <i :class="[item.isSubShow ? 'icon-greyline-up' : 'icon-greyline-down']"></i></h2>
+					<ul class="sub-menu" v-show="item.isSubShow">
+						<li class="" v-for="subItem in item.subItems">
+							<router-link :to="{ path: 'helpdetails', query: { type: item.deposition, id: item.id }}">{{subItem.name}}</router-link>
+						</li>
+					</ul>
+				</li>
+				<!-- <li>
+					<h2 class="clearfix">玩转班级  <i class="icon-greyline-down"></i></h2>
+					<ul class="sub-menu">
+						<li>通化市兴化教育中心第一小学教研活动拉开序幕？</li>
+						<li>怎样使用文档微课？</li>
+						<li>怎样使用提问？</li>
+						<li>怎样使用拍照上墙？</li>
+						<li>怎样使用签到 ？</li>
+					</ul>
+				</li> -->
+			</ul>
+		</nav>
 	</div>
 </template>
 <script>
@@ -45,6 +46,7 @@
 
 		methods: {
 			showToggle(item) {
+				console.log("toggle", item);
 				item.isSubShow = !item.isSubShow
 			}
 		}
@@ -61,7 +63,6 @@
 	}
 	.sidebar {
 		position: fixed;
-		z-index: 1;
 		top: 80px;
 		bottom: 0;
 
@@ -69,12 +70,14 @@
 		display: block;
 		float: left;
 		max-width: 280px;
+		min-width: 200px;
 		background-color: #fff;
 		padding-top: 30px;
 
 		min-height: calc(~'100vh - 80px');
 		overflow-y: auto;
 	}
+	
 
 	.menu {
 		width: 100%;
@@ -132,7 +135,6 @@
 }
 
 @media screen and (max-width: 767px) {
-	
 	.logo {
 		display: block;
 		width: 100%;
@@ -152,6 +154,10 @@
 	.sidebar {
 		display: block;
 		background: #2C3E50;
+	}
+	.nav {
+		height: 100%;
+		overflow-y: auto;
 	}
 
 	.menu {

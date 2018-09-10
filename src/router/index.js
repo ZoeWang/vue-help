@@ -11,18 +11,20 @@ const HelpDetails = resolve => require(['@/components/page/helpdetails'], resolv
 
 export default new Router({
 	linkActiveClass: 'active',
+	// mode: 'history',
   	routes: [
 	    {
 	      	path: '/',
-	      	name: 'help',
 	      	component: Help,
 	      	children: [
 	      		{ 
 	      			path: "/", 
+	      			name: 'help',
 	      			redirect: "/help/details"
 	      		},
 	      		{ 
 	      			path: "/help/details", 
+	      			name: 'helpdetails',
 	      			component: HelpDetails,
 	      			meta: {
 	      				title: '帮助中心' + defaultSuffixTitle
