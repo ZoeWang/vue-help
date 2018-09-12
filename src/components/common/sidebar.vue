@@ -8,11 +8,19 @@
 			
 
 			<ul class="menu">
-				<li v-for="item in items">
-					<h2 class="clearfix" @click="showToggle(item)">{{item.name}}  <i :class="[item.isSubShow ? 'icon-greyline-up' : 'icon-greyline-down']"></i></h2>
+				<li v-for="(item,index) in items" :key="index">
+					<h2 class="clearfix" @click.stop="showToggle(item,index)">{{item.name}}  <i :class="[item.isSubShow ? 'icon-greyline-up' : 'icon-greyline-down']"></i></h2>
 					<ul class="sub-menu" v-show="item.isSubShow">
-						<li class="" v-for="subItem in item.subItems">
-							<router-link :to="{ path: 'helpdetails', query: { type: item.deposition, id: item.id }}">{{subItem.name}}</router-link>
+						<li class="" v-for="(subItem,ind) in item.subItems" :key="subItem.id">
+
+							<!-- <span class="link" 
+								:class="{'active': item.active}"
+								@click="appToggle(subItem.id,ind)"
+								>{{subItem.title}}</span> -->
+							<router-link class="link" 
+								:to="{ path: 'details', query: { type: type, id: subItem.id }}"
+								
+								>{{subItem.title}}</router-link>
 						</li>
 					</ul>
 				</li>
@@ -34,21 +42,71 @@
 	export default {
 		data() {
 			return {
-				
+				items: this.sideItems
 			}
 		},
 		props: {
-			items: {
+			sideItems: {
 				type: Array,
 				required: true
+			},
+			id: [String, Number]
+		},
+		computed: {
+			type() {
+				return sessionStorage.getItem('whelp-type')
+			},
+			articleId() {
+				return this.$route.query.id;
 			}
 		},
-
-		methods: {
-			showToggle(item) {
-				console.log("toggle", item);
-				item.isSubShow = !item.isSubShow
+		mounted(){
+			// console.log("id---------", this.id)
+			if(!this.articleId) {
+				
+				this.showToggle(this.items[0], 0);
+				this.$router.push({
+					path: 'details',
+					query: {
+						type: this.type,
+						id: this.id
+					}
+				})
 			}
+			// console.log("items", this.items)
+		},
+		methods: {
+			showToggle(item,index) {
+
+				item.isSubShow = !item.isSubShow;
+				this.items.splice(index, 1, item);
+
+				// console.log("toggle", item);
+				// console.log("items======", this.items);
+			},
+			// 暂且不用
+			appToggle(id,ind) {
+				this.$router.push({
+					path: 'details',
+					query: {
+						type: this.type,
+						id: id
+					}
+				})
+				let flag = false;
+				this.$emit("navToggle", flag)	// 手机端切换
+				console.log("iiiiiiii======", this.items);
+			},
+
+			setSideBar() {
+				let strItems = JSON.stringify(this.items);
+				let aid = this.articleId || this.id;
+				sessionStorage.setItem('whelp-sidedata', strItems);
+				sessionStorage.setItem('whelp-articleId', aid);
+			}
+		},
+		watch: {
+			'$route': 'setSideBar'
 		}
 	}
 </script>
@@ -70,7 +128,7 @@
 		display: block;
 		float: left;
 		max-width: 280px;
-		min-width: 200px;
+		min-width: 280px;
 		background-color: #fff;
 		padding-top: 30px;
 
@@ -88,6 +146,7 @@
 				color: #333333;
 				line-height: 18px;
 				padding: 20px 12px;
+				cursor: pointer;
 
 				> i {
 					float: right;
@@ -118,15 +177,17 @@
 			letter-spacing: 0;
 			line-height: 17px;
 			border-left: 3px solid #fff;
-			a {
+			.link {
 				display: block;
 				padding: 10px 24px;
-			}
-			a.active {
+				cursor: pointer;
 
-				background: #F7FBFB;
-				border-left: 3px solid #37AEA9;
-				color: #009791;
+				&.router-link-exact-active {
+
+					background: #F7FBFB;
+					border-left: 3px solid #37AEA9;
+					color: #009791;
+				}
 			}
 		}
 	}
@@ -198,16 +259,19 @@
 			letter-spacing: 0;
 			line-height: 1.3em;
 			border-left: 0;
-			a {
+			.link {
 				display: block;
 				padding: 13/2px 61/2px;
-			}
-			a.active {
+				color: #D5D5D5;
+				cursor: pointer;
 
-				background: #FD7E23;
-				border-left:0;
-				color: #FFFFFF;
+				&.router-link-exact-active {
+					background: #FD7E23;
+					border-left:0;
+					color: #FFFFFF;
+				}
 			}
+
 		}
 	}
 }

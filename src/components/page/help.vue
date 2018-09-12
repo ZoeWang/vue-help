@@ -3,7 +3,12 @@
 		<v-head @toggleNav="navToggle" class="m-head"  :class="[navFlag ? 'show' : '']"></v-head>
 		<div class="help clearfix">
 			
-			<v-sidebar id="sideBar" class="sidebar-flag" :class="[navFlag ? 'show' : '']" :items="items"></v-sidebar>
+			<v-sidebar id="sideBar" class="sidebar-flag" 
+				:class="[navFlag ? 'show' : '']" 
+				:sideItems="items" 
+				v-if="items.length && id"
+				:id = id 
+				></v-sidebar>
 			<transition name="fade">
 				<router-view id="details"  class="details"  :class="[navFlag ? 'show' : '']"></router-view>
 			</transition>
@@ -21,47 +26,48 @@
 			return {
 				navFlag: false,		// 是否显示侧边栏
 				items: [],
+				id: '',			// 文章id
 				// items: [{
 				// 	name: "快速上手",
 				// 	isSubShow: true,
 				// 	subItems:[{
-				// 		name: '通化市兴化教育中心第一小学教研活动拉开序幕？',
+				// 		title: '通化市兴化教育中心第一小学教研活动拉开序幕？',
 				// 	}, {
-				// 		name: '怎样使用文档微课？',
+				// 		title: '怎样使用文档微课？',
 				// 	}, {
-				// 		name: '怎样使用提问？',
+				// 		title: '怎样使用提问？',
 				// 	}, {
-				// 		name: '怎样使用拍照上墙？',
+				// 		title: '怎样使用拍照上墙？',
 				// 	}, {
-				// 		name: '怎样使用签到 ？'
+				// 		title: '怎样使用签到 ？'
 				// 	}]
 				// }, {
 				// 	name: "玩转班级",
 				// 	isSubShow: false,
 				// 	subItems:[{
-				// 		name: '通化市兴化教育中心第一小学教研活动拉开序幕？',
+				// 		title: '通化市兴化教育中心第一小学教研活动拉开序幕？',
 				// 	}, {
-				// 		name: '怎样使用文档微课？',
+				// 		title: '怎样使用文档微课？',
 				// 	}, {
-				// 		name: '怎样使用提问？',
+				// 		title: '怎样使用提问？',
 				// 	}, {
-				// 		name: '怎样使用拍照上墙？',
+				// 		title: '怎样使用拍照上墙？',
 				// 	}, {
-				// 		name: '怎样使用签到 ？'
+				// 		title: '怎样使用签到 ？'
 				// 	}]
 				// }, {
 				// 	name: "报告导出报表",
 				// 	isSubShow: false,
 				// 	subItems:[{
-				// 		name: '通化市兴化教育中心第一小学教研活动拉开序幕？',
+				// 		title: '通化市兴化教育中心第一小学教研活动拉开序幕？',
 				// 	}, {
-				// 		name: '怎样使用文档微课？',
+				// 		title: '怎样使用文档微课？',
 				// 	}, {
-				// 		name: '怎样使用提问？',
+				// 		title: '怎样使用提问？',
 				// 	}, {
-				// 		name: '怎样使用拍照上墙？',
+				// 		title: '怎样使用拍照上墙？',
 				// 	}, {
-				// 		name: '怎样使用签到 ？'
+				// 		title: '怎样使用签到 ？'
 				// 	}]
 				// }]
 			}
@@ -69,15 +75,38 @@
 		computed: {
 			type() {
 				return this.$route.query.type;
+			},
+			
+			articleId() {
+				return this.$route.query.id;
 			}
+
 		},
 		mounted() {
-			this.getItems(this.type);
+			if(this.type) {
+				this.setType();
+			}
+			this.getSideBar();
+			// this.getItems(this.type);
 		},
 		methods: {
+			getSideBar() {
+				let jsonItems = sessionStorage.getItem('whelp-sidedata');
+				let items = JSON.parse(jsonItems);
+				this.items = items || [];
+				this.id = sessionStorage.getItem('whelp-articleId') || '';
+
+				if(!jsonItems) {
+					this.getItems(this.type);
+				}
+				console.log("this.items====", this.items);
+			},
+			setType() {
+				sessionStorage.setItem('whelp-type', this.type);
+			},
 			navToggle() {
 				this.navFlag = !this.navFlag
-				console.log("navFlag", this.navFlag);
+				// console.log("navFlag", this.navFlag);
 				if(this.navFlag) {
 					document.getElementsByTagName("html")[0].setAttribute("style","overflow: hidden")
 					document.body.style.overflow='hidden';
@@ -102,6 +131,7 @@
 				
 			},
 			formatData(items) {
+
 				this.items = items.map((item, index, array) => {
 					item.isSubShow = false;
 
@@ -111,22 +141,63 @@
 				console.log("formatData", this.items);
 
 				this.items.forEach((val, index, arr) => {
-					console.log("val.id", val.id);
-					this.getTitle(val.id);
+					// console.log("val.id", val.id);
+					this.getTitle(val.id).then((res) => {
+
+						val.subItems = res.data.data;
+
+					}).catch(err => {
+						console.log(err);
+					});
+					
 				})
+				this.getFirstId();
+				console.log("组装后的items ", this.items)
 			},
+
 			getTitle(id) {
-				getList(id).then((res) => {
-					console.log("getTitle", res)
-				}).catch(err => {
-					console.log(err);
+				return new Promise((resolve, reject) => {
+					getList(id).then((success) => {
+						resolve(success);
+					}).catch(err => {
+						reject(err);
+						console.log(err);
+					})
+				})
+				
+				// console.log("", data)
+			},
+			getFirstId() {
+				// this.items.forEach((val, index) => {
+				// 	if(val.isSubShow == true) {
+				// 		this.id = val.subItemsid
+				// 	} else {
+
+				// 	}
+				// })
+
+				this.getTitle(this.items[0].id).then((res) => {
+					this.id = res.data.data[0].id;
+
+					// console.log("ididididii=====",  this.id);
 				})
 			}
-			
 		},
 		components: {
 			vHead,
 			vSidebar
+		},
+		watch: {
+			'$route': function() {
+				this.navFlag = false;
+				if(this.navFlag) {
+					document.getElementsByTagName("html")[0].setAttribute("style","overflow: hidden")
+					document.body.style.overflow='hidden';
+				} else {
+					document.getElementsByTagName("html")[0].setAttribute("style","overflow: auto")
+					document.body.style.overflow='auto';
+				}
+			}
 		}
 	}
 </script>

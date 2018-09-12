@@ -1,30 +1,59 @@
 <template>
 	<div class="help-details">
-		<h1 class="title">通化市兴化教育中心第一小学教研活动拉开序幕？</h1>
+		<h1 class="title">{{det.title}}</h1>
 
-		<article class="article">
-			<p>原标题：网传北京地铁封站 相关部门表示已是三年前的旧消息，9月2日，网传一份涉及北京地铁多条线路部分站台封站、列车甩站通过的截图流出，记者向北京市地铁运营有限公司求证，北京地铁公司党委宣传部相关负责人表示，目前尚未接到上级通知，如果有封站消息会通过北京地铁公司...</p>
+		<article class="article" v-html="det.content">
+			
+			<!-- <p>原标题：网传北京地铁封站 相关部门表示已是三年前的旧消息，9月2日，网传一份涉及北京地铁多条线路部分站台封站、列车甩站通过的截图流出，记者向北京市地铁运营有限公司求证，北京地铁公司党委宣传部相关负责人表示，目前尚未接到上级通知，如果有封站消息会通过北京地铁公司...</p>
 
 			<img src="http://res.shixunbao.cn/face2face-official/homepagepicimage/b75801deecaf4816ab818ae64cd35a7c.jpg" alt="">
 
 			<p>网传北京地铁封站怎么回事?辟谣!网传北京地铁封站真相曝光!　【网传北京地铁多线路将封站 地铁公司：2015年旧闻】9月2日，网传一份涉及北京地铁多条线路部分站台封站、列车甩站通过的截图流出</p>
 
-			<p><a href="">网传北京地铁封站怎么回事?辟谣!网传北京地铁封站真相曝光!　【网传北京地铁多线路将封站 地铁公司：2015年旧闻】9月2日，网传一份涉及北京地铁多条线路部分站台封站、列车甩站通过的截图流出</a></p>
+			<p><a href="">网传北京地铁封站怎么回事?辟谣!网传北京地铁封站真相曝光!　【网传北京地铁多线路将封站 地铁公司：2015年旧闻】9月2日，网传一份涉及北京地铁多条线路部分站台封站、列车甩站通过的截图流出</a></p> -->
 		</article>
 	</div>
 </template>
 <script>
+	import { getDetails  } from '@/fetch/help'
+
 	export default {
+		data() {
+			return {
+				det: {}
+			}
+			
+		},
 		computed: {
 			type() {
 				return this.$route.query.type;
+			},
+			articleId() {
+				return this.$route.query.id;
 			}
 		},
 		mounted() {
+			if(this.articleId) {
+				this.getDet(this.articleId);
+			}
 			
 		},
 		methods: {
-			
+			getDet(id) {
+				getDetails(id).then((res) => {
+					// console.log("details",res);
+
+					if(res.data.status == 200) {
+						this.det = res.data.data;
+					}
+					
+				}).catch(err => {
+					console.log(err);
+				})
+			}
+		},
+		watch: {
+			'articleId': 'getDet'
 		}
 	}
 </script>
@@ -41,6 +70,7 @@
 		color: #333333;
 		line-height: 1em;
 		margin: 25px 0 35px;
+		text-align: center;
 	}
 	.article {
 		font-size: 12px;
