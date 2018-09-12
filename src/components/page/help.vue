@@ -150,8 +150,8 @@
 				this.items.forEach((val, index, arr) => {
 					// console.log("val.id", val.id);
 					this.getTitle(val.id).then((res) => {
-
-						val.subItems = res.data.data;
+            this.$set(val, 'subItems', res.data.data);
+					// val.subItems = res.data.data;
 
 					}).catch(err => {
 						console.log(err);
