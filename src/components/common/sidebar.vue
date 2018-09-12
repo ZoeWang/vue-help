@@ -18,7 +18,7 @@
 								@click="appToggle(subItem.id,ind)"
 								>{{subItem.title}}</span> -->
 							<router-link class="link" 
-								:to="{ path: 'details', query: { type: type, id: subItem.id }}"
+								:to="{ path: 'details', query: { type: type, columnId: item.id, id: subItem.id }}"
 								
 								>{{subItem.title}}</router-link>
 						</li>
@@ -50,7 +50,8 @@
 				type: Array,
 				required: true
 			},
-			id: [String, Number]
+			ids: [String, Number],
+			columnIds: [String, Number],
 		},
 		computed: {
 			type() {
@@ -58,22 +59,38 @@
 			},
 			articleId() {
 				return this.$route.query.id;
+			},
+			columnId() {
+				return this.$route.query.columnId;
 			}
 		},
 		mounted(){
 			// console.log("id---------", this.id)
 			if(!this.articleId) {
-				
+				// 默认选第一个
 				this.showToggle(this.items[0], 0);
 				this.$router.push({
 					path: 'details',
 					query: {
 						type: this.type,
-						id: this.id
+						columnId: this.columnIds,
+						id: this.ids
 					}
 				})
-			}
-			// console.log("items", this.items)
+			} 
+
+			// if(this.articleId){
+			// 	let n;
+			// 	this.items.forEach((val,index) => {
+			// 		if(val.id == this.columnId) {
+			// 			n = index;
+			// 		}
+			// 	})
+			// 	console.log("nnn===", n);
+			// 	this.items[n].isSubShow = true; 
+			// 	this.items.splice(n, 1, this.items[n]);
+			// }
+
 		},
 		methods: {
 			showToggle(item,index) {
@@ -84,20 +101,8 @@
 				// console.log("toggle", item);
 				// console.log("items======", this.items);
 			},
-			// 暂且不用
-			appToggle(id,ind) {
-				this.$router.push({
-					path: 'details',
-					query: {
-						type: this.type,
-						id: id
-					}
-				})
-				let flag = false;
-				this.$emit("navToggle", flag)	// 手机端切换
-				console.log("iiiiiiii======", this.items);
-			},
-
+			
+			
 			setSideBar() {
 				let strItems = JSON.stringify(this.items);
 				let aid = this.articleId || this.id;

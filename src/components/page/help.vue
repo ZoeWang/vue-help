@@ -7,7 +7,8 @@
 				:class="[navFlag ? 'show' : '']" 
 				:sideItems="items" 
 				v-if="items.length && id"
-				:id = id 
+				:ids = id 
+				:columnIds = columnId
 				></v-sidebar>
 			<transition name="fade">
 				<router-view id="details"  class="details"  :class="[navFlag ? 'show' : '']"></router-view>
@@ -27,6 +28,7 @@
 				navFlag: false,		// 是否显示侧边栏
 				items: [],
 				id: '',			// 文章id
+				columnId: '',	// 栏目Id
 				// items: [{
 				// 	name: "快速上手",
 				// 	isSubShow: true,
@@ -86,7 +88,12 @@
 			if(this.type) {
 				this.setType();
 			}
-			this.getSideBar();
+			if(this.articleId) {
+				this.getSideBar();
+			} else {
+				this.getItems(this.type);
+			}
+			
 			// this.getItems(this.type);
 		},
 		methods: {
@@ -94,7 +101,7 @@
 				let jsonItems = sessionStorage.getItem('whelp-sidedata');
 				let items = JSON.parse(jsonItems);
 				this.items = items || [];
-				this.id = sessionStorage.getItem('whelp-articleId') || '';
+				this.id = this.articleId;
 
 				if(!jsonItems) {
 					this.getItems(this.type);
@@ -168,18 +175,10 @@
 				// console.log("", data)
 			},
 			getFirstId() {
-				// this.items.forEach((val, index) => {
-				// 	if(val.isSubShow == true) {
-				// 		this.id = val.subItemsid
-				// 	} else {
-
-				// 	}
-				// })
-
 				this.getTitle(this.items[0].id).then((res) => {
+					this.columnId = this.items[0].id;
 					this.id = res.data.data[0].id;
 
-					// console.log("ididididii=====",  this.id);
 				})
 			}
 		},
