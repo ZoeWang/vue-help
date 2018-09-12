@@ -151,7 +151,7 @@
 					// console.log("val.id", val.id);
 					this.getTitle(val.id).then((res) => {
             this.$set(val, 'subItems', res.data.data);
-					// val.subItems = res.data.data;
+					// val.subItems = res.data.data; 错误写法
 
 					}).catch(err => {
 						console.log(err);
